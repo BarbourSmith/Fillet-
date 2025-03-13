@@ -11,7 +11,7 @@
         },
         {
             "name": "name2",
-            "ioValue": 10
+            "ioValue": 2
         }
     ],
     "description": "Molecules provide an organizational structure to contain atoms. Double click on a molecule to enter it. Use the up arrow in the upper right hand corner of the screen to go up one level.",
@@ -44,8 +44,8 @@
         {
             "atomType": "Code",
             "name": "Code",
-            "x": 0.5357142857142857,
-            "y": 0.5793871866295265,
+            "x": 0.531084656084656,
+            "y": 0.42618384401114207,
             "uniqueID": 1741842529280,
             "ioValues": [
                 {
@@ -54,7 +54,7 @@
                 },
                 {
                     "name": "radius",
-                    "ioValue": 10
+                    "ioValue": 2
                 }
             ],
             "description": "Defines a Replicad code block.",
@@ -82,8 +82,8 @@
         {
             "atomType": "Extrude",
             "name": "Extrude",
-            "x": 0.3306878306878307,
-            "y": 0.19220055710306408,
+            "x": 0.3353174603174603,
+            "y": 0.15598885793871867,
             "uniqueID": 1741842595016,
             "ioValues": [
                 {
