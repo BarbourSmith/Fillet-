@@ -37,62 +37,12 @@
       "type": "geometry"
     },
     {
-      "atomType": "Rectangle",
-      "x": 0.14204545454545456,
-      "y": 0.5518292682926829,
-      "uniqueID": 1741842589311,
-      "ioValues": [
-        {
-          "name": "x length",
-          "ioValue": 10
-        },
-        {
-          "name": "y length",
-          "ioValue": 10
-        }
-      ]
-    },
-    {
-      "atomType": "Extrude",
-      "x": 0.2746955345060893,
-      "y": 0.48780487804878053,
-      "uniqueID": 1741842595016,
-      "ioValues": [
-        {
-          "name": "geometry",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "height",
-          "ioValue": 10
-        }
-      ]
-    },
-    {
       "atomType": "Input",
       "x": 0.025384615384615384,
       "y": 0.24615384615384617,
       "uniqueID": 1741842654264,
       "name": "Radius",
       "type": "number"
-    },
-    {
-      "atomType": "Code",
-      "x": 0.506628787878788,
-      "y": 0.22865853658536586,
-      "uniqueID": "7ed74a19-52e8-415d-97fb-160faa17cf6e",
-      "ioValues": [
-        {
-          "name": "inputShape",
-          "ioValue": "__GEOMETRY_INPUT__"
-        },
-        {
-          "name": "radius",
-          "ioValue": "__GEOMETRY_INPUT__"
-        }
-      ],
-      "interpreterVersion": 1,
-      "code": "      //Inputs:[inputShape, radius]\n      //This defines the molecules inputs and creates variables with the same names which can be referenced in the code\n      \n      //Takes the address and gets the shape from the library\n      let importedShape = library[inputShape]\n      \n      //This makes a new copy of of the shape (to prevent garbage collection issues),\n      //and moves it in the X direction. Note that this will not work if the input is an assembly\n      let chamferedShape = await Fillet(inputShape, radius);\n      \n      \n      //Shapes stored in the library have tags, a color, a plane, and a bill of materials like this. We don't modify them here\n      let shape1 = {\n        geometry: [chamferedShape],\n        tags: importedShape.tags,\n        color: importedShape.color,\n        plane: importedShape.plane,\n        bom: importedShape.bom\n      }\n      \n      //We could at this point return shape1 as a complete shape and it will be automatically written to the library for us\n      return shape1"
     },
     {
       "atomType": "Code",
@@ -146,8 +96,8 @@
     },
     {
       "atomType": "Code",
-      "x": 0.572595281306715,
-      "y": 0.4847560975609756,
+      "x": 0.5054446460980037,
+      "y": 0.41463414634146345,
       "uniqueID": "id-51",
       "ioValues": [
         {
@@ -156,79 +106,24 @@
         },
         {
           "name": "radius",
-          "ioValue": 4
+          "ioValue": 2
         }
       ],
       "interpreterVersion": 1,
-      "code": "\n/**\n * =========================================================================\n *  ABUNDANCE CODE ATOM — Quick Reference\n * =========================================================================\n *\n *  HOW INPUTS WORK\n *  ---------------\n *  Every parameter of run() becomes an input port on this atom.\n *  Four types are supported:\n *\n *    number   -> numeric input / slider\n *    string   -> text input  (great for hex color codes, labels, etc.)\n *    boolean  -> true/false toggle\n *    Assembly -> geometry -- wire this to the output of another atom\n *\n *  Give a parameter a default value ( = x ) to make it optional.\n *  Mark it with ? (name?: Assembly) to make it optional with no default.\n *  Parameters without a default must be connected before the atom runs.\n *\n *  RETURN VALUE\n *  ------------\n *  Return an Assembly, an Assembly[], or a primitive (number/string/boolean).\n *  Returning an Assembly[] lets downstream atoms (BOM, cut layout...)\n *  see each piece independently.\n *\n *  GEOMETRY API  (replicad is available as a global)\n *  -------------------------------------------------\n *  Create 2-D sketches\n *    replicad.drawCircle(radius)\n *    replicad.drawRectangle(width, height)\n *    replicad.drawRoundedRectangle(width, height, cornerRadius)\n *\n *  Turn a 2-D sketch into a 3-D solid\n *    sketch.sketchOnPlane().extrude(distance)\n *    sketch.sketchOnPlane().revolve()          // rotate 360 deg around Z\n *\n *  Create 3-D primitives directly\n *    replicad.makeBaseBox(width, depth, height)\n *    replicad.makeSphere(radius)\n *    replicad.makeCylinder(radius, height)\n *\n *  Boolean operations\n *    solidA.fuse(solidB)                       // union\n *    solidA.cut(solidB)                        // difference (cut a hole)\n *    solidA.intersect(solidB)                  // intersection\n *\n *  Post-processing\n *    solid.fillet(radius)                      // round ALL edges\n *    solid.fillet(r, e => e.inPlane(\"XY\", z))  // round only top-face edges\n *    solid.chamfer(distance)                   // bevel ALL edges\n *    solid.translate(x, y, z)                  // move the solid\n *    solid.rotate(angle, [0, 0, 1])            // rotate around Z axis\n *\n *  ASSEMBLY CLASS\n *  --------------\n *  Wrap any replicad solid in an Assembly to attach display metadata:\n *    new Assembly({ geometry, color, tags, bom })\n *      geometry -> replicad solid / drawing returned by the API above\n *      color    -> hex string shown in the 3-D viewport  (\"#A3CE5B\")\n *      tags     -> string[] used for filtering in cut layout / BOM\n *      bom      -> string[] lines added to the Bill of Materials panel\n *\n *  AI PROMPT TIP\n *  -------------\n *  Copy the code in this editor into ChatGPT / Claude and say something like:\n *    \"Modify this Abundance Code Atom to create a gear with 12 teeth\"\n *    \"Change this to make a hexagonal nut instead of a round plate\"\n *  The comments above give the AI all the context it needs to produce\n *  valid, working Abundance TypeScript code.\n * =========================================================================\n */\n\n/**\n * A rectangular mounting plate with a circular hole in the centre.\n * All parameters have defaults so the atom produces geometry immediately\n * after creation — no connections required to get started.\n */\nfunction run(\n  inputShape: Assembly, radius: number       \n) {\n \n  inputShape.geometry.fillet(radius)\n  console.log(inputShape)\n  //We could at this point return shape1 as a complete shape and it will be automatically written to the library for us\n  return inputShape\n}\n",
-      "compiledCode": "\"use strict\";\n/**\n * =========================================================================\n *  ABUNDANCE CODE ATOM — Quick Reference\n * =========================================================================\n *\n *  HOW INPUTS WORK\n *  ---------------\n *  Every parameter of run() becomes an input port on this atom.\n *  Four types are supported:\n *\n *    number   -> numeric input / slider\n *    string   -> text input  (great for hex color codes, labels, etc.)\n *    boolean  -> true/false toggle\n *    Assembly -> geometry -- wire this to the output of another atom\n *\n *  Give a parameter a default value ( = x ) to make it optional.\n *  Mark it with ? (name?: Assembly) to make it optional with no default.\n *  Parameters without a default must be connected before the atom runs.\n *\n *  RETURN VALUE\n *  ------------\n *  Return an Assembly, an Assembly[], or a primitive (number/string/boolean).\n *  Returning an Assembly[] lets downstream atoms (BOM, cut layout...)\n *  see each piece independently.\n *\n *  GEOMETRY API  (replicad is available as a global)\n *  -------------------------------------------------\n *  Create 2-D sketches\n *    replicad.drawCircle(radius)\n *    replicad.drawRectangle(width, height)\n *    replicad.drawRoundedRectangle(width, height, cornerRadius)\n *\n *  Turn a 2-D sketch into a 3-D solid\n *    sketch.sketchOnPlane().extrude(distance)\n *    sketch.sketchOnPlane().revolve()          // rotate 360 deg around Z\n *\n *  Create 3-D primitives directly\n *    replicad.makeBaseBox(width, depth, height)\n *    replicad.makeSphere(radius)\n *    replicad.makeCylinder(radius, height)\n *\n *  Boolean operations\n *    solidA.fuse(solidB)                       // union\n *    solidA.cut(solidB)                        // difference (cut a hole)\n *    solidA.intersect(solidB)                  // intersection\n *\n *  Post-processing\n *    solid.fillet(radius)                      // round ALL edges\n *    solid.fillet(r, e => e.inPlane(\"XY\", z))  // round only top-face edges\n *    solid.chamfer(distance)                   // bevel ALL edges\n *    solid.translate(x, y, z)                  // move the solid\n *    solid.rotate(angle, [0, 0, 1])            // rotate around Z axis\n *\n *  ASSEMBLY CLASS\n *  --------------\n *  Wrap any replicad solid in an Assembly to attach display metadata:\n *    new Assembly({ geometry, color, tags, bom })\n *      geometry -> replicad solid / drawing returned by the API above\n *      color    -> hex string shown in the 3-D viewport  (\"#A3CE5B\")\n *      tags     -> string[] used for filtering in cut layout / BOM\n *      bom      -> string[] lines added to the Bill of Materials panel\n *\n *  AI PROMPT TIP\n *  -------------\n *  Copy the code in this editor into ChatGPT / Claude and say something like:\n *    \"Modify this Abundance Code Atom to create a gear with 12 teeth\"\n *    \"Change this to make a hexagonal nut instead of a round plate\"\n *  The comments above give the AI all the context it needs to produce\n *  valid, working Abundance TypeScript code.\n * =========================================================================\n */\n/**\n * A rectangular mounting plate with a circular hole in the centre.\n * All parameters have defaults so the atom produces geometry immediately\n * after creation — no connections required to get started.\n */\nfunction run(inputShape, radius) {\n    inputShape.geometry.fillet(radius);\n    console.log(inputShape);\n    //We could at this point return shape1 as a complete shape and it will be automatically written to the library for us\n    return inputShape;\n}\n"
-    },
-    {
-      "atomType": "Code",
-      "x": 0.5399274047186933,
-      "y": 0.75,
-      "uniqueID": "id-62",
-      "ioValues": [
-        {
-          "name": "width",
-          "ioValue": 40
-        },
-        {
-          "name": "depth",
-          "ioValue": 30
-        },
-        {
-          "name": "thickness",
-          "ioValue": 5
-        },
-        {
-          "name": "holeRadius",
-          "ioValue": 6
-        },
-        {
-          "name": "color",
-          "ioValue": "#5B9BD5",
-          "currentEquation": "#5B9BD5"
-        },
-        {
-          "name": "addFillet",
-          "ioValue": true
-        },
-        {
-          "name": "extra",
-          "ioValue": "__GEOMETRY_INPUT__"
-        }
-      ],
-      "interpreterVersion": 1,
-      "code": "\n/**\n * =========================================================================\n *  ABUNDANCE CODE ATOM — Quick Reference\n * =========================================================================\n *\n *  HOW INPUTS WORK\n *  ---------------\n *  Every parameter of run() becomes an input port on this atom.\n *  Four types are supported:\n *\n *    number   -> numeric input / slider\n *    string   -> text input  (great for hex color codes, labels, etc.)\n *    boolean  -> true/false toggle\n *    Assembly -> geometry -- wire this to the output of another atom\n *\n *  Give a parameter a default value ( = x ) to make it optional.\n *  Mark it with ? (name?: Assembly) to make it optional with no default.\n *  Parameters without a default must be connected before the atom runs.\n *\n *  RETURN VALUE\n *  ------------\n *  Return an Assembly, an Assembly[], or a primitive (number/string/boolean).\n *  Returning an Assembly[] lets downstream atoms (BOM, cut layout...)\n *  see each piece independently.\n *\n *  GEOMETRY API  (replicad is available as a global)\n *  -------------------------------------------------\n *  Create 2-D sketches\n *    replicad.drawCircle(radius)\n *    replicad.drawRectangle(width, height)\n *    replicad.drawRoundedRectangle(width, height, cornerRadius)\n *\n *  Turn a 2-D sketch into a 3-D solid\n *    sketch.sketchOnPlane().extrude(distance)\n *    sketch.sketchOnPlane().revolve()          // rotate 360 deg around Z\n *\n *  Create 3-D primitives directly\n *    replicad.makeBaseBox(width, depth, height)\n *    replicad.makeSphere(radius)\n *    replicad.makeCylinder(radius, height)\n *\n *  Boolean operations\n *    solidA.fuse(solidB)                       // union\n *    solidA.cut(solidB)                        // difference (cut a hole)\n *    solidA.intersect(solidB)                  // intersection\n *\n *  Post-processing\n *    solid.fillet(radius)                      // round ALL edges\n *    solid.fillet(r, e => e.inPlane(\"XY\", z))  // round only top-face edges\n *    solid.chamfer(distance)                   // bevel ALL edges\n *    solid.translate(x, y, z)                  // move the solid\n *    solid.rotate(angle, [0, 0, 1])            // rotate around Z axis\n *\n *  ASSEMBLY CLASS\n *  --------------\n *  Wrap any replicad solid in an Assembly to attach display metadata:\n *    new Assembly({ geometry, color, tags, bom })\n *      geometry -> replicad solid / drawing returned by the API above\n *      color    -> hex string shown in the 3-D viewport  (\"#A3CE5B\")\n *      tags     -> string[] used for filtering in cut layout / BOM\n *      bom      -> string[] lines added to the Bill of Materials panel\n *\n *  AI PROMPT TIP\n *  -------------\n *  Copy the code in this editor into ChatGPT / Claude and say something like:\n *    \"Modify this Abundance Code Atom to create a gear with 12 teeth\"\n *    \"Change this to make a hexagonal nut instead of a round plate\"\n *  The comments above give the AI all the context it needs to produce\n *  valid, working Abundance TypeScript code.\n * =========================================================================\n */\n\n/**\n * A rectangular mounting plate with a circular hole in the centre.\n * All parameters have defaults so the atom produces geometry immediately\n * after creation — no connections required to get started.\n */\nfunction run(\n  width: number = 40,        \n  depth: number = 30,       \n  thickness: number = 5,    \n  holeRadius: number = 6,   \n  color: string = \"#5B9BD5\", \n  addFillet: boolean = true, \n  extra?: Assembly           \n) {\n  // ── Step 1: Create the base solid ────────────────────────────────────────\n  // makeBaseBox(width, depth, height) places a box with one corner at the\n  // origin.  Translate it so the hole will be centred at (0, 0).\n  let plate = replicad\n    .makeBaseBox(width, depth, thickness)\n    .translate(-width / 2, -depth / 2, 0);\n\n  // ── Step 2: Cut a through-hole in the centre ──────────────────────────────\n  // Extrude a circle slightly taller than the plate so the cut goes all the\n  // way through.  Start 1 mm below the bottom face to avoid coplanar issues.\n  const holeCutter = replicad\n    .drawCircle(holeRadius)\n    .sketchOnPlane()\n    .extrude(thickness + 2)\n    .translate(0, 0, -1);\n\n  plate = plate.cut(holeCutter);\n\n  // ── Step 3: Optional fillet on the top-face edges ────────────────────────\n  // inPlane(\"XY\", thickness) selects only the edges that lie in the\n  // horizontal plane at z = thickness (i.e. the top face of the plate).\n  if (addFillet) {\n    plate = plate.fillet(1.5, (e) => e.inPlane(\"XY\", thickness));\n  }\n\n  // ── Step 4: Wrap in an Assembly to set display properties ─────────────────\n  const plateAssembly = new Assembly({\n    geometry: plate,\n    color: color,\n    tags: [\"plate\", \"mounting-plate\"],\n    bom: [`Mounting plate ${width}×${depth}×${thickness} mm`],\n  });\n\n  // ── Step 5: Combine with any upstream geometry ────────────────────────────\n  // Returning an array lets each piece stay independent for the BOM and\n  // cut-layout atoms.  If nothing is connected, `extra` is undefined.\n  const results: Assembly[] = [plateAssembly];\n  if (extra) results.push(extra);\n  return results;\n}\n",
-      "compiledCode": "\"use strict\";\n/**\n * =========================================================================\n *  ABUNDANCE CODE ATOM — Quick Reference\n * =========================================================================\n *\n *  HOW INPUTS WORK\n *  ---------------\n *  Every parameter of run() becomes an input port on this atom.\n *  Four types are supported:\n *\n *    number   -> numeric input / slider\n *    string   -> text input  (great for hex color codes, labels, etc.)\n *    boolean  -> true/false toggle\n *    Assembly -> geometry -- wire this to the output of another atom\n *\n *  Give a parameter a default value ( = x ) to make it optional.\n *  Mark it with ? (name?: Assembly) to make it optional with no default.\n *  Parameters without a default must be connected before the atom runs.\n *\n *  RETURN VALUE\n *  ------------\n *  Return an Assembly, an Assembly[], or a primitive (number/string/boolean).\n *  Returning an Assembly[] lets downstream atoms (BOM, cut layout...)\n *  see each piece independently.\n *\n *  GEOMETRY API  (replicad is available as a global)\n *  -------------------------------------------------\n *  Create 2-D sketches\n *    replicad.drawCircle(radius)\n *    replicad.drawRectangle(width, height)\n *    replicad.drawRoundedRectangle(width, height, cornerRadius)\n *\n *  Turn a 2-D sketch into a 3-D solid\n *    sketch.sketchOnPlane().extrude(distance)\n *    sketch.sketchOnPlane().revolve()          // rotate 360 deg around Z\n *\n *  Create 3-D primitives directly\n *    replicad.makeBaseBox(width, depth, height)\n *    replicad.makeSphere(radius)\n *    replicad.makeCylinder(radius, height)\n *\n *  Boolean operations\n *    solidA.fuse(solidB)                       // union\n *    solidA.cut(solidB)                        // difference (cut a hole)\n *    solidA.intersect(solidB)                  // intersection\n *\n *  Post-processing\n *    solid.fillet(radius)                      // round ALL edges\n *    solid.fillet(r, e => e.inPlane(\"XY\", z))  // round only top-face edges\n *    solid.chamfer(distance)                   // bevel ALL edges\n *    solid.translate(x, y, z)                  // move the solid\n *    solid.rotate(angle, [0, 0, 1])            // rotate around Z axis\n *\n *  ASSEMBLY CLASS\n *  --------------\n *  Wrap any replicad solid in an Assembly to attach display metadata:\n *    new Assembly({ geometry, color, tags, bom })\n *      geometry -> replicad solid / drawing returned by the API above\n *      color    -> hex string shown in the 3-D viewport  (\"#A3CE5B\")\n *      tags     -> string[] used for filtering in cut layout / BOM\n *      bom      -> string[] lines added to the Bill of Materials panel\n *\n *  AI PROMPT TIP\n *  -------------\n *  Copy the code in this editor into ChatGPT / Claude and say something like:\n *    \"Modify this Abundance Code Atom to create a gear with 12 teeth\"\n *    \"Change this to make a hexagonal nut instead of a round plate\"\n *  The comments above give the AI all the context it needs to produce\n *  valid, working Abundance TypeScript code.\n * =========================================================================\n */\n/**\n * A rectangular mounting plate with a circular hole in the centre.\n * All parameters have defaults so the atom produces geometry immediately\n * after creation — no connections required to get started.\n */\nfunction run(width = 40, depth = 30, thickness = 5, holeRadius = 6, color = \"#5B9BD5\", addFillet = true, extra) {\n    // ── Step 1: Create the base solid ────────────────────────────────────────\n    // makeBaseBox(width, depth, height) places a box with one corner at the\n    // origin.  Translate it so the hole will be centred at (0, 0).\n    let plate = replicad\n        .makeBaseBox(width, depth, thickness)\n        .translate(-width / 2, -depth / 2, 0);\n    // ── Step 2: Cut a through-hole in the centre ──────────────────────────────\n    // Extrude a circle slightly taller than the plate so the cut goes all the\n    // way through.  Start 1 mm below the bottom face to avoid coplanar issues.\n    const holeCutter = replicad\n        .drawCircle(holeRadius)\n        .sketchOnPlane()\n        .extrude(thickness + 2)\n        .translate(0, 0, -1);\n    plate = plate.cut(holeCutter);\n    // ── Step 3: Optional fillet on the top-face edges ────────────────────────\n    // inPlane(\"XY\", thickness) selects only the edges that lie in the\n    // horizontal plane at z = thickness (i.e. the top face of the plate).\n    if (addFillet) {\n        plate = plate.fillet(1.5, (e) => e.inPlane(\"XY\", thickness));\n    }\n    // ── Step 4: Wrap in an Assembly to set display properties ─────────────────\n    const plateAssembly = new Assembly({\n        geometry: plate,\n        color: color,\n        tags: [\"plate\", \"mounting-plate\"],\n        bom: [`Mounting plate ${width}×${depth}×${thickness} mm`],\n    });\n    // ── Step 5: Combine with any upstream geometry ────────────────────────────\n    // Returning an array lets each piece stay independent for the BOM and\n    // cut-layout atoms.  If nothing is connected, `extra` is undefined.\n    const results = [plateAssembly];\n    if (extra)\n        results.push(extra);\n    return results;\n}\n"
+      "code": "/**\n * Rounds sharp edges on a 3D solid geometry using fillets.\n * A fillet smooths out edges by rounding them to a specified radius.\n * All parameters have defaults so the atom works immediately.\n */\nfunction run(\n  inputShape: Assembly,\n  radius: number = 1.5,\n  edgeSelector?: boolean\n): Assembly {\n  // ── Step 1: Validate input geometry ──────────────────────────────────────\n  // Fillets only work on 3D solids, not 2D sketches or wires.\n  if (!inputShape?.geometry?.fillet) {\n    throw new Error(\"Input must be a 3D solid geometry\");\n  }\n\n  // ── Step 2: Apply fillet to selected edges ──────────────────────────────\n  // If no edge selector is provided, fillet all edges.\n  // Pass a selector like (e) => e.inPlane(\"XY\", z) to fillet only specific edges.\n  let filletedGeometry = inputShape.geometry;\n  if (edgeSelector) {\n    filletedGeometry = inputShape.geometry.fillet(radius, edgeSelector);\n  } else {\n    filletedGeometry = inputShape.geometry.fillet(radius);\n  }\n\n  // ── Step 3: Wrap in an Assembly preserving upstream properties ──────────\n  // Color, tags, and BOM info are inherited from the input shape.\n  const result: Assembly = new Assembly({\n    geometry: filletedGeometry,\n    color: inputShape.color,\n    tags: inputShape.tags,\n    plane: inputShape.plane,\n    bom: inputShape.bom,\n  });\n\n  return result;\n}",
+      "compiledCode": "\"use strict\";\n/**\n * Rounds sharp edges on a 3D solid geometry using fillets.\n * A fillet smooths out edges by rounding them to a specified radius.\n * All parameters have defaults so the atom works immediately.\n */\nfunction run(inputShape, radius = 1.5, edgeSelector) {\n    // ── Step 1: Validate input geometry ──────────────────────────────────────\n    // Fillets only work on 3D solids, not 2D sketches or wires.\n    if (!inputShape?.geometry?.fillet) {\n        throw new Error(\"Input must be a 3D solid geometry\");\n    }\n    // ── Step 2: Apply fillet to selected edges ──────────────────────────────\n    // If no edge selector is provided, fillet all edges.\n    // Pass a selector like (e) => e.inPlane(\"XY\", z) to fillet only specific edges.\n    let filletedGeometry = inputShape.geometry;\n    if (edgeSelector) {\n        filletedGeometry = inputShape.geometry.fillet(radius, edgeSelector);\n    }\n    else {\n        filletedGeometry = inputShape.geometry.fillet(radius);\n    }\n    // ── Step 3: Wrap in an Assembly preserving upstream properties ──────────\n    // Color, tags, and BOM info are inherited from the input shape.\n    const result = new Assembly({\n        geometry: filletedGeometry,\n        color: inputShape.color,\n        tags: inputShape.tags,\n        plane: inputShape.plane,\n        bom: inputShape.bom,\n    });\n    return result;\n}\n"
     }
   ],
   "allConnectors": [
     {
       "ap2Name": "inputShape",
       "ap1ID": 1741842527071,
-      "ap2ID": "7ed74a19-52e8-415d-97fb-160faa17cf6e"
-    },
-    {
-      "ap2Name": "geometry",
-      "ap1ID": 1741842589311,
-      "ap2ID": 1741842595016
-    },
-    {
-      "ap2Name": "inputShape",
-      "ap1ID": 1741842595016,
       "ap2ID": "id-51"
     },
     {
       "ap2Name": "radius",
       "ap1ID": 1741842654264,
-      "ap2ID": "7ed74a19-52e8-415d-97fb-160faa17cf6e"
-    },
-    {
-      "ap2Name": "number or geometry",
-      "ap1ID": "7ed74a19-52e8-415d-97fb-160faa17cf6e",
-      "ap2ID": 1741842522266
+      "ap2ID": "id-51"
     },
     {
       "ap2Name": "geometry",
@@ -239,6 +134,11 @@
       "ap2Name": "inputShape",
       "ap1ID": "id-25",
       "ap2ID": "id-17"
+    },
+    {
+      "ap2Name": "number or geometry",
+      "ap1ID": "id-51",
+      "ap2ID": 1741842522266
     }
   ],
   "unitsKey": "MM",
